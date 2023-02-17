@@ -6,6 +6,8 @@ const jwt = require('jsonwebtoken');
 
 require('dotenv').config();
 
+const bcrypt = require('bcrypt');
+
 router.post('/signup', (req, res) => {
   console.log(req.body);
   // res.send('This is POST(SignUpPage)!');   //cannot send 2 responses to the same request
@@ -35,6 +37,38 @@ router.post('/signup', (req, res) => {
         return res.status(422).send({ error: err.message });
       }
     })
+});
+
+router.post('/signin', async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(422).send({ error: 'Please add email or password' });
+  }
+  const savedUser = await User.findOne({ email: email })
+  if (!savedUser) {
+    // console.log("Invalid Email")
+    return res.status(422).send({ error: 'Invalid Email or Password' });
+  }
+
+  try {
+     bcrypt.compare(password, savedUser.password, (err, result) =>{
+       if(result){
+        // console.log('password matched');
+         const token = jwt.sign({ _id: savedUser._id }, process.env.JWT_SECRET);
+         res.send({ token });
+       } 
+      else{
+        //  console.log('password not matched')
+        return res.status(422).send({ error: 'Invalid Creditial' });
+      }
+    
+    });
+
+  }
+  catch (err) {
+    console.log(err);
+  }
+
 });
 
 module.exports = router;
