@@ -9,8 +9,7 @@ require('dotenv').config();
 const bcrypt = require('bcrypt');
 
 router.post('/signup', (req, res) => {
-  console.log(req.body);
-  // res.send('This is POST(SignUpPage)!');   //cannot send 2 responses to the same request
+  console.log('sent by client ', req.body);
   const { name, email, password, dob } = req.body;
   if (!name || !email || !password || !dob) {
     return res.status(422).send({ error: 'Please add all the fields' });
@@ -18,7 +17,7 @@ router.post('/signup', (req, res) => {
   User.findOne({ email: email })
     .then(async (savedUser) => {
       if (savedUser) {
-        return res.status(422).send({ error: "Invalid Creditial" });
+        return res.status(422).send({ error: "Already Existed User" });
       }
       const user = new User({
         name,
@@ -47,7 +46,7 @@ router.post('/signin', async (req, res) => {
   const savedUser = await User.findOne({ email: email })
   if (!savedUser) {
     // console.log("Invalid Email")
-    return res.status(422).send({ error: 'Invalid Email or Password' });
+    return res.status(422).send({ error: 'Invalid Email ' });
   }
 
   try {
@@ -59,7 +58,7 @@ router.post('/signin', async (req, res) => {
        } 
       else{
         //  console.log('password not matched')
-        return res.status(422).send({ error: 'Invalid Creditial' });
+        return res.status(422).send({ error: 'password not matched' });
       }
     
     });
