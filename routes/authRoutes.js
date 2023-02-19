@@ -104,7 +104,7 @@ router.post('/verify', (req, res) => {
           otp,
         }
         await NodeMailer(email, otp).catch(console.error);
-        res.send({ message: "OTP sent to your email",userData:user });
+        res.send({ message: "OTP sent to your email",Udata:user });
       } catch (err) {
         console.log('OTP error', err)
         return res.status(422).send({ error: err.message });
