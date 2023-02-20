@@ -53,17 +53,13 @@ async function NodeMailer(receiverEmail, otp) {
 
 //
 
-router.post('/signup', (req, res) => {
+router.post('/signup', async (req, res) => {
   console.log('sent by client ', req.body);
   const { name, email, password, dob } = req.body;
   if (!name || !email || !password || !dob) {
     return res.status(422).send({ error: 'Please add all the fields' });
   }
-  User.findOne({ email: email })
-    .then(async (savedUser) => {
-      if (savedUser) {
-        return res.status(422).send({ error: "Already Existed User" });
-      }
+  
       const user = new User({
         name,
         email,
@@ -74,13 +70,12 @@ router.post('/signup', (req, res) => {
         await user.save();
         // res.send({ message: "User Saved Successfully" });
         const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
-        res.send({ token });
+        res.send({message:"User Registered Successfully", token });
 
       } catch (err) {
         console.log('db err', err)
         return res.status(422).send({ error: err.message });
       }
-    })
 });
 
 router.post('/verify', (req, res) => {
